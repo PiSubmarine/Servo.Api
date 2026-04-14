@@ -1,7 +1,15 @@
 include("${PISUBMARINE_BUILD_SYSTEM}")
 
 message("Adding library: ${PISUBMARINE_MODULE_NAME}")
-add_library(${PISUBMARINE_MODULE_NAME}
-        PiSubmarine/ModuleTemplate/ModuleTemplate.cpp)
-target_include_directories(${PISUBMARINE_MODULE_NAME} PUBLIC "../public")
+add_library(${PISUBMARINE_MODULE_NAME} INTERFACE)
+target_include_directories(${PISUBMARINE_MODULE_NAME} INTERFACE "../public")
 PiSubmarineInitTarget(${PISUBMARINE_MODULE_NAME})
+
+get_filename_component(PISUBMARINE_UNITS_REPOSITORY "${CMAKE_CURRENT_SOURCE_DIR}/../../Units" ABSOLUTE)
+if (EXISTS "${PISUBMARINE_UNITS_REPOSITORY}/.git")
+    PiSubmarineAddDependency("${PISUBMARINE_UNITS_REPOSITORY}" "")
+    target_include_directories(${PISUBMARINE_MODULE_NAME} INTERFACE "${PISUBMARINE_UNITS_REPOSITORY}/public")
+else()
+    PiSubmarineAddDependency("https://github.com/PiSubmarine/Units" "")
+endif()
+target_link_libraries(${PISUBMARINE_MODULE_NAME} INTERFACE PiSubmarine.Units)

@@ -61,6 +61,11 @@ Test for this class is placed in test/PiSubmarine/Drv8908/DriverTest.cpp. This r
 - Avoid "utility" or "misc" modules. If you see a common functionality that should be extracted, ask what to do.
 - If a module grows beyond a single responsibility, split it.
 
+### Build and CMake Usage
+
+CMake must always be invoked using presets (consult CMakePresets.json). For example, for Windows host the correct preset
+is "windows-x64-debug". Do not call CMake manually with custom parameters.
+
 ## Target platforms
 
 The main targets are:
@@ -80,12 +85,13 @@ The main targets are:
   namespace. For example, the module that defines SPI driver interface is named "PiSubmarine.Spi.Api".
 - Namespaces should be treated as part of class names; do not repeat words in full names (e.g., use "class PiSubmarine::
   Drv8908::Driver" instead of "class PiSubmarine::Drv8908::Drv8908Driver").
+- Interfaces should be prefixed with "I".
 
 ## Cross-cutting concepts
 
 - spdlog is used for logging on all platforms, except STM32 (no logging on STM32).
 - gtest is used for unit tests on all platforms, except STM32 (no unit tests for platform-specific STM32 code).
-- If code may fail, use std::expected<Value, ErrorEnum> for return values.
+- If code may fail, use std::expected<Value, ErrorEnum> for return values, even if Value is void.
 - Use fail-fast error handling for errors that are not recoverable. Usage of exceptions is allowed on all platforms,
   except STM32.
 - All platforms support C++23, all modules are compiled with C++23.
@@ -153,6 +159,7 @@ In case that multi-threading is required, adhere to the following rules:
 - Mock external dependencies using gmock.
 - Do not test implementation details. Test behavior instead.
 - Platform-specific code may skip tests only if impossible to mock.
+- If some non-trivial code is constexpr, test that it can actually be evaluated at compile time. Use static_assert.
 
 ## Logging
 
