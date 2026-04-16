@@ -1,7 +1,6 @@
-#include <expected>
-
 #include <gtest/gtest.h>
 
+#include "PiSubmarine/Error/Api/Result.h"
 #include "PiSubmarine/Servo/IControllerMock.h"
 
 namespace PiSubmarine::Servo
@@ -12,7 +11,7 @@ namespace PiSubmarine::Servo
         constexpr auto targetAngle = PiSubmarine::Radians(1.0);
 
         EXPECT_CALL(controllerMock, SetTargetAngle(targetAngle))
-            .WillOnce(testing::Return(std::expected<void, Error>{}));
+            .WillOnce(testing::Return(PiSubmarine::Error::Api::Result<void>{}));
 
         const auto result = controllerMock.SetTargetAngle(targetAngle);
 
@@ -24,7 +23,7 @@ namespace PiSubmarine::Servo
         IControllerMock controllerMock;
 
         EXPECT_CALL(controllerMock, SetEnabled(false))
-            .WillOnce(testing::Return(std::expected<void, Error>{}));
+            .WillOnce(testing::Return(PiSubmarine::Error::Api::Result<void>{}));
 
         const auto result = controllerMock.SetEnabled(false);
 
@@ -37,11 +36,13 @@ namespace PiSubmarine::Servo
         constexpr auto lastTargetAngle = PiSubmarine::Radians(1.0);
 
         EXPECT_CALL(controllerMock, IsEnabled())
-            .WillOnce(testing::Return(false));
+            .WillOnce(testing::Return(PiSubmarine::Error::Api::Result<bool>(false)));
         EXPECT_CALL(controllerMock, GetTargetAngle())
             .WillOnce(testing::Return(lastTargetAngle));
 
-        EXPECT_FALSE(controllerMock.IsEnabled());
+        const auto isEnabled = controllerMock.IsEnabled();
+        ASSERT_TRUE(isEnabled.has_value());
+        EXPECT_FALSE(isEnabled.value());
         EXPECT_EQ(controllerMock.GetTargetAngle(), lastTargetAngle);
     }
 }

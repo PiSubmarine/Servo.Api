@@ -1,12 +1,8 @@
 #pragma once
 
+#include "PiSubmarine/Error/Api/Error.h"
+
 namespace PiSubmarine::Servo
 {
-    enum class Error
-    {
-        TargetAngleOutOfRange,
-        HardwareUnavailable,
-        CommunicationFailure,
-        Timeout
-    };
+    using Error = PiSubmarine::Error::Api::Error;
 }
